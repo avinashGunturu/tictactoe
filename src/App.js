@@ -3,19 +3,18 @@ import React, { useState } from "react";
 import Board from "./components/Board";
 import History from "./components/History";
 import StatusMessage from "./components/StatusMessage";
-
-import "./components/style/root.scss";
 import { calculateWinner } from "./components/heapers";
+import "./components/style/root.scss";
+
+const NEW_GAME = [{ board: Array(9).fill(null), isXnext: true }];
 
 function App() {
-  const [history, setHistory] = useState([
-    { board: Array(9).fill(null), isXnext: true },
-  ]);
+  const [history, setHistory] = useState(NEW_GAME);
   const [currentMove, setCurrentMove] = useState(0);
 
   const current = history[currentMove];
 
-  const winner = calculateWinner(current.board);
+  const { winner, winningSquare } = calculateWinner(current.board);
 
   const handleSquarClick = (position) => {
     if (current.board[position] || winner) {
@@ -39,11 +38,21 @@ function App() {
   const moveTo = (move) => {
     setCurrentMove(move);
   };
+
+  const goToNewGame = () => {
+    setHistory(NEW_GAME);
+    setCurrentMove(0);
+  };
   return (
     <div className="app">
       <h1>TIC TAC TOE</h1>
       <StatusMessage winner={winner} current={current} />
-      <Board handleSquarClick={handleSquarClick} board={current.board} />
+      <Board
+        handleSquarClick={handleSquarClick}
+        board={current.board}
+        winningSquare={winningSquare}
+      />
+      <button onClick={goToNewGame}> Start New Game</button>
       <History history={history} moveTo={moveTo} currentMove={currentMove} />
     </div>
   );
