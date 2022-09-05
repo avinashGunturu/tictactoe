@@ -5,34 +5,42 @@ import "./components/style/root.scss";
 import { calculateWinner } from "./components/heapers";
 
 function App() {
-  const [board, setBoard] = useState(Array(9).fill(null));
-  const [isXnext, setISXNext] = useState(false);
+  const [history, setHistory] = useState([
+    { board: Array(9).fill(null), isXnext: true },
+  ]);
+  console.log(history);
+  const [currentMove, setCurrentMove] = useState(0);
 
-  const winner = calculateWinner(board);
+  const current = history[currentMove];
+
+  const winner = calculateWinner(current.board);
 
   const message = winner
     ? `winner is ${winner}`
-    : `Next player is ${isXnext ? "X" : "O"}`;
+    : `Next player is ${current.isXnext ? "X" : "O"}`;
   const handleSquarClick = (position) => {
-    if (board[position] || winner) {
+    if (current.board[position] || winner) {
       return;
     }
-    setBoard((prev) => {
-      return prev.map((square, pos) => {
+    setHistory((prev) => {
+      const last = prev[prev.length - 1];
+
+      const newBoard = last.board.map((square, pos) => {
         if (pos === position) {
-          return isXnext ? "X" : "O";
+          return last.isXnext ? "X" : "O";
         }
 
         return square;
       });
+      return prev.concat({ board: newBoard, isXnext: !last.isXnext });
     });
-    setISXNext((prev) => !prev);
+    setCurrentMove((prev) => prev + 1);
   };
   return (
     <div className="app">
       <h1>TIC TAC TOE</h1>
       <h2>{message}</h2>
-      <Board handleSquarClick={handleSquarClick} board={board} />
+      <Board handleSquarClick={handleSquarClick} board={current.board} />
     </div>
   );
 }
